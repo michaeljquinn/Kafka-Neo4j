@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+VAGRANTFILE_API_VERSION = "2"
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.box = "bento/ubuntu-18.04"
+
+  config.vm.synced_folder ".", "/vagrant", :mount_options => ["dmode=777","fmode=777"]
+  config.vm.synced_folder "/home/mquinn/gitRepo/VagrantFiles/scripts/os-installs", "/os-installs", :mount_options => ["dmode=777","fmode=777"]
+  #config.vm.synced_folder "/home/mquinn/gitRepo/neo4j-kafka-connect-neo4j-1.0.4", "/neo4j-kafka-streams", :mount_options => ["dmode=777","fmode=777"]
+
+
+  # config.vm.network :public_network, ip: "10.0.0.101"
+  config.vm.network :public_network
+  config.vm.network :forwarded_port, guest: 7474, host: 7474
+  config.vm.network :forwarded_port, guest: 6477, host: 6477
+  config.vm.network :forwarded_port, guest: 7687, host: 7687
+  config.vm.network :forwarded_port, guest: 8080, host: 9080
+
+
+
+
+  config.vm.provider :virtualbox do |vb|
+    vb.customize ["modifyvm", :id, "--memory", "4096"]
+    vb.customize ["modifyvm", :id, "--name", "neo4jkafka.dev.ubuntu18.04"]
+#    vb.gui = "false"
+  end
+  config.vm.provision :shell, :inline => "/os-installs/ubuntu-18.04LTS/install-minimal-ubuntu18lts.bash"
+  config.vm.provision :shell, :inline => "/os-installs/ubuntu-18.04LTS/shutdown.bash"
+end
